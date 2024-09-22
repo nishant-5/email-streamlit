@@ -35,16 +35,20 @@ if st.button("Generate Subject Line"):
 
 # Ensure the model and tensors are sent to the device (CPU in this case)
         model = model.to(device)
-        inputs = tokenizer_hub(email_content, return_tensors="pt", max_length=512, truncation=True)
-        inputs = {key: value.to(device) for key, value in inputs.items()}
-        
-        
-        # Generate the subject line using the model
-        outputs = model.generate(inputs['input_ids'], max_length=100, num_beams=5, early_stopping=True)
-        
-        # Decode and clean the output (skipping special tokens)
-        subject_line = tokenizer_hub.decode(outputs[0], skip_special_tokens=True)
+        input_prompt = f"""
+            Generate subject for below email:
 
+            {email_content}
+
+            Subject:
+            """
+
+        # Tokenize the input prompt
+        input_ids = tokenizer_hfhub(input_prompt, return_tensors='pt', max_length=512)
+        # Generate the subject line using the model
+        tokenized_output = model_hfhub.generate(input_ids['input_ids'], min_length=10, max_length=128)
+        # Decode and clean the output (skipping special tokens)
+        subject_line = tokenizer_hfhub.decode(tokenized_output[0], skip_special_tokens=True).strip()
         # Remove potential custom tokens manually if they persist
         # unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
         # for token in unwanted_tokens:
