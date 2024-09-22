@@ -16,7 +16,7 @@ def load_model():
     return tokenizer, model
 
 # Load the model
-tokenizer, model = load_model()
+tokenizer_hub, model = load_model()
 
 # Set up the Streamlit app
 st.title("Email Subject Line Generator")
@@ -28,7 +28,13 @@ email_content = st.text_area("Enter Email Content:", height=200)
 if st.button("Generate Subject Line"):
     if email_content:  # Check if the user entered any email content
         # Tokenize the input using the tokenizer, not the model
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Ensure the model and tensors are sent to the device (CPU in this case)
+        model = model.to(device)
         inputs = tokenizer(email_content, return_tensors="pt", max_length=512, truncation=True)
+        inputs = {key: value.to(device) for key, value in inputs.items()}
+        
         
         # Generate the subject line using the model
         outputs = model.generate(inputs['input_ids'], max_length=100, num_beams=5, early_stopping=True)
