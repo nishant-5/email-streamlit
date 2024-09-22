@@ -30,7 +30,7 @@ if st.button("Generate Subject Line"):
         # Tokenize the input using the tokenizer, not the model
         model_name = "Nishantc05/emailSubGen-bartmodel"  # Replace with your Hugging Face model
         tokenizer_hfhub = AutoTokenizer.from_pretrained(model_name)
-        model = BartForConditionalGeneration.from_pretrained(model_name)
+        model_hfhub = BartForConditionalGeneration.from_pretrained(model_name)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Ensure the model and tensors are sent to the device (CPU in this case)
