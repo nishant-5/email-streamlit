@@ -43,12 +43,12 @@ if st.button("Generate Subject Line"):
         outputs = model.generate(inputs['input_ids'], max_length=100, num_beams=5, early_stopping=True)
         
         # Decode and clean the output (skipping special tokens)
-        subject_line = tokenizer_hub.decode(outputs[0], skip_special_tokens=True).strip()
+        subject_line = tokenizer_hub.decode(outputs[0], skip_special_tokens=True)
 
         # Remove potential custom tokens manually if they persist
-        unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
-        for token in unwanted_tokens:
-            subject_line = subject_line.replace(token, '')
+        # unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
+        # for token in unwanted_tokens:
+        #     subject_line = subject_line.replace(token, '')
         
         # Display only the generated subject line (answer)
         st.subheader("Generated Subject Line:")
