@@ -34,7 +34,7 @@ if st.button("Generate Subject Line"):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Ensure the model and tensors are sent to the device (CPU in this case)
-        model = model.to(device)
+        model_hfhub = model_hfhub.to(device)
         input_prompt = f"""
             Generate subject for below email:
 
