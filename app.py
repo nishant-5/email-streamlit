@@ -19,8 +19,8 @@ if st.button("Generate a subject line"):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model.to(device)
         tokenizer = AutoModelForSeq2SeqLM.from_pretrained("Nishantc05/emailSubGen-bartmodel")
-        tokenizer.padding_side = "left"
-        tokenizer.pad_token=tokenizer.eos_token
+        #tokenizer.padding_side = "left"
+        #tokenizer.pad_token=tokenizer.eos_token
         inputs = tokenizer.encode(email_content, return_tensors="pt", max_length=512, truncation=True)
         outputs = model.generate(inputs, max_length=100, num_beams=5, early_stopping=True)
         subject_line = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
