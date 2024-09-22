@@ -7,18 +7,27 @@ from transformers import GPT2Model, GPT2Config, AutoModelForCausalLM
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
-st.title("Subject Line Email Generation")
+# Load the model and tokenizer from Hugging Face
+@st.cache_resource
+def load_model():
+    model_name = "Nishantc05/emailSubGen-bartmodel"  # Replace with your Hugging Face model
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = BartForConditionalGeneration.from_pretrained(model_name)
+    return tokenizer, model
 
-# Text input from user
-email_content = st.text_area("Enter the email content", height=200)
+# Load the model
+tokenizer, model = load_model()
 
-if st.button("Generate a subject line"):
-    if email_content:
-        # Tokenize and generate subject line
-        model = AutoModelForSeq2SeqLM.from_pretrained("Nishantc05/emailSubGen-bartmodel")
-        tokenizer = AutoModelForSeq2SeqLM.from_pretrained("Nishantc05/emailSubGen-bartmodel")
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model.to(device)
+# Set up the Streamlit app
+st.title("Email Subject Line Generator")
+
+# Get the email content from the user
+email_content = st.text_area("Enter Email Content:", height=200)
+
+# Only display the generated subject line when the button is pressed
+if st.button("Generate Subject Line"):
+    if email_content:  # Check if the user entered any email content
+        # Tokenize the input using the tokenizer, not the model
         inputs = tokenizer(email_content, return_tensors="pt", max_length=512, truncation=True)
         
         # Generate the subject line using the model
@@ -31,7 +40,11 @@ if st.button("Generate a subject line"):
         unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
         for token in unwanted_tokens:
             subject_line = subject_line.replace(token, '')
-        st.subheader("Generated Subject line.")
+        
+        # Display only the generated subject line (answer)
+        st.subheader("Generated Subject Line:")
         st.write(subject_line)
     else:
+        # Prompt the user to enter something if the text box is empty
         st.write("Please enter some email content to generate a subject line.")
+
