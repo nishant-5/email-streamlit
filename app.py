@@ -8,15 +8,15 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
 # Load the model and tokenizer from Hugging Face
-@st.cache_resource
-def load_model():
-    model_name = "Nishantc05/emailSubGen-bartmodel"  # Replace with your Hugging Face model
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = BartForConditionalGeneration.from_pretrained(model_name)
-    return tokenizer, model
+# @st.cache_resource
+# def load_model():
+#     model_name = "Nishantc05/emailSubGen-bartmodel"  # Replace with your Hugging Face model
+#     tokenizer = AutoTokenizer.from_pretrained(model_name)
+#     model = BartForConditionalGeneration.from_pretrained(model_name)
+#     return tokenizer, model
 
-# Load the model
-tokenizer_hub, model = load_model()
+# # Load the model
+# tokenizer_hub, model = load_model()
 
 # Set up the Streamlit app
 st.title("Email Subject Line Generator")
@@ -28,11 +28,14 @@ email_content = st.text_area("Enter Email Content:", height=200)
 if st.button("Generate Subject Line"):
     if email_content:  # Check if the user entered any email content
         # Tokenize the input using the tokenizer, not the model
+        model_name = "Nishantc05/emailSubGen-bartmodel"  # Replace with your Hugging Face model
+        tokenizer_hub = AutoTokenizer.from_pretrained(model_name)
+        model = BartForConditionalGeneration.from_pretrained(model_name)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Ensure the model and tensors are sent to the device (CPU in this case)
         model = model.to(device)
-        inputs = tokenizer(email_content, return_tensors="pt", max_length=512, truncation=True)
+        inputs = tokenizer_hub(email_content, return_tensors="pt", max_length=512, truncation=True)
         inputs = {key: value.to(device) for key, value in inputs.items()}
         
         
@@ -40,7 +43,7 @@ if st.button("Generate Subject Line"):
         outputs = model.generate(inputs['input_ids'], max_length=100, num_beams=5, early_stopping=True)
         
         # Decode and clean the output (skipping special tokens)
-        subject_line = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+        subject_line = tokenizer_hub.decode(outputs[0], skip_special_tokens=True).strip()
 
         # Remove potential custom tokens manually if they persist
         unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
