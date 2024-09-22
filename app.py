@@ -16,18 +16,19 @@ if st.button("Generate a subject line"):
     if email_content:
         # Tokenize and generate subject line
         model = AutoModelForSeq2SeqLM.from_pretrained("Nishantc05/emailSubGen-bartmodel")
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model.to(device)
         tokenizer = AutoModelForSeq2SeqLM.from_pretrained("Nishantc05/emailSubGen-bartmodel")
-        #tokenizer.padding_side = "left"
-        #tokenizer.pad_token=tokenizer.eos_token
-        inputs = tokenizer.encode(email_content, return_tensors="pt", max_length=512, truncation=True)
-        outputs = model.generate(inputs, max_length=100, num_beams=5, early_stopping=True)
+        inputs = tokenizer(email_content, return_tensors="pt", max_length=512, truncation=True)
+        
+        # Generate the subject line using the model
+        outputs = model.generate(inputs['input_ids'], max_length=20, num_beams=5, early_stopping=True)
+        
+        # Decode and clean the output (skipping special tokens)
         subject_line = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
-        unwanted_tokens = ['<ANSWER_ENDED>', email_content,'Answer']
+
+        # Remove potential custom tokens manually if they persist
+        unwanted_tokens = ['<ANSWER_ENDED>', '<QUESTION>', '<ANSWER>']
         for token in unwanted_tokens:
             subject_line = subject_line.replace(token, '')
-        #subject_line = tokenizer.decode(skip_special_tokens=True)
         st.subheader("Generated Subject line.")
         st.write(subject_line)
     else:
