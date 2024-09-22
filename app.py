@@ -31,7 +31,7 @@ if st.button("Generate Subject Line"):
         inputs = tokenizer(email_content, return_tensors="pt", max_length=512, truncation=True)
         
         # Generate the subject line using the model
-        outputs = model.generate(inputs['input_ids'], max_length=20, num_beams=5, early_stopping=True)
+        outputs = model.generate(inputs['input_ids'], max_length=100, num_beams=5, early_stopping=True)
         
         # Decode and clean the output (skipping special tokens)
         subject_line = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
